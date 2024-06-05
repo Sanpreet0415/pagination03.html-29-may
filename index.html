@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .sort-options {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .product {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .product {
+                width: calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product List</h1>
+        <div class="sort-options">
+            <label for="sort">Sort by: </label>
+            <select id="sort">
+                <option value="name">Name</option>
+                <!-- Add more sort options if needed -->
+            </select>
+        </div>
+        <div id="product-list" class="product-list"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const url = "https://jsonplaceholder.typicode.com/users";
+            const productList = document.getElementById("product-list");
+
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            };
+
+            const displayProducts = async () => {
+                const products = await fetchData();
+                products.forEach(product => {
+                    const productElement = document.createElement("div");
+                    productElement.classList.add("product");
+                    productElement.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p>${product.email}</p>
+                        <p>${product.phone}</p>
+                    `;
+                    productList.appendChild(productElement);
+                });
+            };
+
+            const sortProducts = async () => {
+                const sortBy = document.getElementById("sort").value;
+                const products = await fetchData();
+                const sortedProducts = [...products].sort((a, b) => {
+                    if (a[sortBy] < b[sortBy]) return -1;
+                    if (a[sortBy] > b[sortBy]) return 1;
+                    return 0;
+                });
+                productList.innerHTML = "";
+                sortedProducts.forEach(product => {
+                    const productElement = document.createElement("div");
+                    productElement.classList.add("product");
+                    productElement.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p>${product.email}</p>
+                        <p>${product.phone}</p>
+                    `;
+                    productList.appendChild(productElement);
+                });
+            };
+
+            document.getElementById("sort").addEventListener("change", sortProducts);
+
+            displayProducts();
+        });
+    </script>
+</body>
+</html>
